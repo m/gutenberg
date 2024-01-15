@@ -549,7 +549,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
-		'link'    => 'a:where(:not(.wp-element-button))', // The `where` is needed to lower the specificity.
+		'link'    => 'a:not(.wp-element-button)',
 		'heading' => 'h1, h2, h3, h4, h5, h6',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
@@ -1566,7 +1566,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : '%s-%s%s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : ':where(%s-%s) %s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -1602,7 +1602,7 @@ class WP_Theme_JSON_Gutenberg {
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
 						$layout_selector = sprintf(
-							'%s .%s',
+							':where(%s .%s)',
 							$selector,
 							$class_name
 						);
@@ -1635,7 +1635,7 @@ class WP_Theme_JSON_Gutenberg {
 							}
 
 							$layout_selector = sprintf(
-								'%s .%s%s',
+								':where(%s .%s%s)',
 								$selector,
 								$class_name,
 								$base_style_rule['selector']
@@ -2660,7 +2660,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2677,7 +2677,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.
@@ -2753,8 +2753,8 @@ class WP_Theme_JSON_Gutenberg {
 		if ( $has_block_gap_support ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
-			$css            .= ':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
-			$css            .= ':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
+			$css            .= ':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
+			$css            .= ':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
