@@ -29,6 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -117,6 +118,16 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	} );
 }
 
+function isAttributeEqual( attribute1, attribute2 ) {
+	if (
+		attribute1 instanceof RichTextData &&
+		attribute2 instanceof RichTextData
+	) {
+		return attribute1.toString() === attribute2.toString();
+	}
+	return attribute1 === attribute2;
+}
+
 function getOverridesFromBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, Record<string, unknown>>} */
 	const overrides = {};
@@ -130,8 +141,10 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				! isAttributeEqual(
+					block.attributes[ attributeKey ],
+					defaultValues[ blockId ][ attributeKey ]
+				)
 			) {
 				overrides[ blockId ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
