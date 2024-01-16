@@ -1060,7 +1060,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $blocks as $block_name => $block_type ) {
-			$root_selector = wp_get_block_css_selector( $block_type );
+			/* $root_selector = wp_get_block_css_selector( $block_type ); */
+			$root_selector = ':where(' . wp_get_block_css_selector( $block_type ) . ')';
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
@@ -1274,7 +1275,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			if ( false !== $root_style_key ) {
+			if ( false !== $root_style_key && empty( $options['skip_root_layout_styles'] ) ) {
 				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
