@@ -32,6 +32,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'alignWide',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
+	'blockPreview',
 	'bodyPlaceholder',
 	'canLockBlocks',
 	'capabilities',
