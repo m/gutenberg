@@ -78,7 +78,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"shadow": true
 	},
 	"editorStyle": "wp-block-columns-editor",
 	"style": "wp-block-columns"
