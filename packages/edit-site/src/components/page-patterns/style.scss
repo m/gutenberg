@@ -30,12 +30,17 @@
 		flex-grow: 1;
 	}
 
-	// The increased specificity here is to overcome component styles
-	// without relying on internal component class names.
+	// TODO: Should be colored using <Theme> once SearchControl supports it.
 	.edit-site-patterns__search {
-		input[type="search"] {
-			height: $button-size-next-default-40px;
+		&:not(:focus-within) .components-input-control__backdrop {
+			border-color: $gray-800;
+		}
+
+		.components-input-control__container {
 			background: $gray-800;
+		}
+
+		input[type="search"] {
 			color: $gray-200;
 
 			&:focus {
