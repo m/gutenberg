@@ -70,7 +70,8 @@
 				"link": true
 			}
 		},
-		"interactivity": true
+		"interactivity": true,
+		"clientNavigation": true
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",

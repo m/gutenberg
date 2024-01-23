@@ -129,7 +129,8 @@
 		},
 		"layout": {
 			"allowJustification": false
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"

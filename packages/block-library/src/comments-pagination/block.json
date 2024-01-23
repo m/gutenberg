@@ -48,7 +48,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-comments-pagination-editor",
 	"style": "wp-block-comments-pagination"

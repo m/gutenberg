@@ -85,7 +85,8 @@
 				"width": true
 			}
 		},
-		"html": false
+		"html": false,
+		"clientNavigation": true
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-search-editor",
