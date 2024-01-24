@@ -342,6 +342,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$all = $variables . $styles . $presets;
 
+		$this->assertEquals( $all, $theme_json->get_stylesheet() );
 		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
 		$this->assertEquals( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
