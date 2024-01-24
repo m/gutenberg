@@ -2471,7 +2471,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		// Results also include root site blocks styles which hard code
 		// `body { margin: 0;}`.
 		$this->assertEquals(
-			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.custom{color: teal;}',
+			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.custom){color: teal;}',
 			$actual
 		);
 	}
