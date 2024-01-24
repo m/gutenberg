@@ -174,15 +174,13 @@ function gutenberg_get_global_styles_custom_css() {
  * @return void
  */
 function gutenberg_add_global_styles_for_blocks() {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
+		return;
+	}
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );
-
-		if ( ! wp_should_load_separate_core_block_assets() ) {
-			wp_add_inline_style( 'global-styles', $block_css );
-			continue;
-		}
 
 		$stylesheet_handle = 'global-styles';
 		if ( isset( $metadata['name'] ) ) {
