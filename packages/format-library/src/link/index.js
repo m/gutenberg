@@ -40,6 +40,8 @@ function Edit( {
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
+	const canMakeLink = ! isCollapsed( value ) && ! addingLink && ! isActive;
+
 	function addLink() {
 		const text = getTextContent( slice( value ) );
 
@@ -76,7 +78,13 @@ function Edit( {
 
 	return (
 		<>
-			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
+			{ canMakeLink && (
+				<RichTextShortcut
+					type="primary"
+					character="k"
+					onUse={ addLink }
+				/>
+			) }
 			<RichTextShortcut
 				type="primaryShift"
 				character="k"
@@ -106,6 +114,7 @@ function Edit( {
 					shortcutCharacter="k"
 					aria-haspopup="true"
 					aria-expanded={ addingLink || isActive }
+					disabled={ ! canMakeLink }
 				/>
 			) }
 			{ ( addingLink || isActive ) && (
