@@ -22,6 +22,7 @@ import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { store } from './';
 import { unlock } from '../lock-unlock';
+import { reusableBlocksSelectKey } from './private-keys';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -299,11 +300,11 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 			__experimentalBlockPatterns = [],
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
-			__experimentalReusableBlocksSelect,
 		} = state.settings;
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
 		const userPatterns = (
-			__experimentalReusableBlocksSelect
-				? __experimentalReusableBlocksSelect( select )
+			reusableBlocksSelect
+				? reusableBlocksSelect( select )
 				: __experimentalReusableBlocks ?? []
 		).map( ( userPattern ) => {
 			return {
