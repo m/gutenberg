@@ -2170,31 +2170,43 @@ export const hasInserterItems = createRegistrySelector(
  *
  * @return {Array?} The list of allowed block types.
  */
-export const getAllowedBlocks = createSelector(
-	( state, rootClientId = null ) => {
-		if ( ! rootClientId ) {
-			return;
-		}
+export const getAllowedBlocks = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			if ( ! rootClientId ) {
+				return;
+			}
 
-		const blockTypes = getBlockTypes().filter( ( blockType ) =>
-			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-		);
+			const blockTypes = getBlockTypes().filter( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			);
 
-		if (
-			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId )
-		) {
-			blockTypes.push( 'core/block' );
-		}
+			const hasReusableBlock =
+				canInsertBlockTypeUnmemoized(
+					state,
+					'core/block',
+					rootClientId
+				) &&
+				unlock( select( STORE_NAME ) ).getReusableBlocks().length > 0;
 
-		return blockTypes;
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getBlockTypes(),
-	]
+			if ( hasReusableBlock ) {
+				blockTypes.push( 'core/block' );
+			}
+
+			return blockTypes;
+		},
+		( state, rootClientId ) =>
+			rootClientId
+				? [
+						state.blockListSettings[ rootClientId ],
+						state.blocks.byClientId.get( rootClientId ),
+						state.settings.allowedBlockTypes,
+						state.settings.templateLock,
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						getBlockTypes(),
+				  ]
+				: []
+	)
 );
 
 export const __experimentalGetAllowedBlocks = createSelector(
