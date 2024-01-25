@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -22,6 +22,14 @@ import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
 const EMPTY_BLOCKS_LIST = [];
+
+function __experimentalReusableBlocksSelect( select ) {
+	return (
+		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} ) ?? EMPTY_BLOCKS_LIST
+	);
+}
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
@@ -94,7 +102,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
-		reusableBlocks,
 		hasUploadPermissions,
 		hiddenBlockTypes,
 		canUseUnfilteredHTML,
@@ -105,13 +112,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		restBlockPatternCategories,
 	} = useSelect(
 		( select ) => {
-			const isWeb = Platform.OS === 'web';
 			const {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
 				getUserPatternCategories,
-				getEntityRecords,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -137,11 +142,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
-				reusableBlocks: isWeb
-					? getEntityRecords( 'postType', 'wp_block', {
-							per_page: -1,
-					  } )
-					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 				userCanCreatePages: canUser( 'create', 'pages' ),
 				pageOnFront: siteSettings?.page_on_front,
@@ -258,7 +258,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					}
 				);
 			},
-			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -297,7 +297,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
-			reusableBlocks,
 			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,

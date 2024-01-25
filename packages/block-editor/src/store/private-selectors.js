@@ -299,27 +299,28 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 			__experimentalBlockPatterns = [],
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
+			__experimentalReusableBlocksSelect,
 		} = state.settings;
-		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
-			( userPattern ) => {
-				return {
-					name: `core/block/${ userPattern.id }`,
-					id: userPattern.id,
-					type: INSERTER_PATTERN_TYPES.user,
-					title: userPattern.title.raw,
-					categories: userPattern.wp_pattern_category.map(
-						( catId ) => {
-							const category = (
-								__experimentalUserPatternCategories ?? []
-							).find( ( { id } ) => id === catId );
-							return category ? category.slug : catId;
-						}
-					),
-					content: userPattern.content.raw,
-					syncStatus: userPattern.wp_pattern_sync_status,
-				};
-			}
-		);
+		const userPatterns = (
+			__experimentalReusableBlocksSelect
+				? __experimentalReusableBlocksSelect( select )
+				: __experimentalReusableBlocks ?? []
+		).map( ( userPattern ) => {
+			return {
+				name: `core/block/${ userPattern.id }`,
+				id: userPattern.id,
+				type: INSERTER_PATTERN_TYPES.user,
+				title: userPattern.title.raw,
+				categories: userPattern.wp_pattern_category.map( ( catId ) => {
+					const category = (
+						__experimentalUserPatternCategories ?? []
+					).find( ( { id } ) => id === catId );
+					return category ? category.slug : catId;
+				} ),
+				content: userPattern.content.raw,
+				syncStatus: userPattern.wp_pattern_sync_status,
+			};
+		} );
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
