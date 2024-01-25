@@ -1957,95 +1957,111 @@ const buildBlockTypeItem =
  *                                        this item.
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
-export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
-		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const icon = ! reusableBlock.wp_pattern_sync_status
-				? {
-						src: symbol,
-						foreground: 'var(--wp-block-synced-color)',
-				  }
-				: symbol;
-			const id = `core/block/${ reusableBlock.id }`;
-			const { time, count = 0 } = getInsertUsage( state, id ) || {};
-			const frecency = calculateFrecency( time, count );
+export const getInserterItems = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			const buildReusableBlockInserterItem = ( reusableBlock ) => {
+				const icon = ! reusableBlock.wp_pattern_sync_status
+					? {
+							src: symbol,
+							foreground: 'var(--wp-block-synced-color)',
+					  }
+					: symbol;
+				const id = `core/block/${ reusableBlock.id }`;
+				const { time, count = 0 } = getInsertUsage( state, id ) || {};
+				const frecency = calculateFrecency( time, count );
 
-			return {
-				id,
-				name: 'core/block',
-				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title?.raw,
-				icon,
-				category: 'reusable',
-				keywords: [ 'reusable' ],
-				isDisabled: false,
-				utility: 1, // Deprecated.
-				frecency,
-				content: reusableBlock.content?.raw,
-				syncStatus: reusableBlock.wp_pattern_sync_status,
+				return {
+					id,
+					name: 'core/block',
+					initialAttributes: { ref: reusableBlock.id },
+					title: reusableBlock.title?.raw,
+					icon,
+					category: 'reusable',
+					keywords: [ 'reusable' ],
+					isDisabled: false,
+					utility: 1, // Deprecated.
+					frecency,
+					content: reusableBlock.content?.raw,
+					syncStatus: reusableBlock.wp_pattern_sync_status,
+				};
 			};
-		};
 
-		const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
-			state,
-			'core/block',
-			rootClientId
-		)
-			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
-			: [];
-
-		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-			buildScope: 'inserter',
-		} );
-
-		const blockTypeInserterItems = getBlockTypes()
-			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
+				state,
+				'core/block',
+				rootClientId
 			)
-			.map( buildBlockTypeInserterItem );
+				? unlock( select( STORE_NAME ) )
+						.getReusableBlocks()
+						.map( buildReusableBlockInserterItem )
+				: [];
 
-		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
-			const { variations = [] } = item;
-			// Exclude any block type item that is to be replaced by a default variation.
-			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
-				accumulator.push( item );
-			}
-			if ( variations.length ) {
-				const variationMapper = getItemFromVariation( state, item );
-				accumulator.push( ...variations.map( variationMapper ) );
-			}
-			return accumulator;
-		}, [] );
+			const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+				buildScope: 'inserter',
+			} );
 
-		// Ensure core blocks are prioritized in the returned results,
-		// because third party blocks can be registered earlier than
-		// the core blocks (usually by using the `init` action),
-		// thus affecting the display order.
-		// We don't sort reusable blocks as they are handled differently.
-		const groupByType = ( blocks, block ) => {
-			const { core, noncore } = blocks;
-			const type = block.name.startsWith( 'core/' ) ? core : noncore;
+			const blockTypeInserterItems = getBlockTypes()
+				.filter( ( blockType ) =>
+					canIncludeBlockTypeInInserter(
+						state,
+						blockType,
+						rootClientId
+					)
+				)
+				.map( buildBlockTypeInserterItem );
 
-			type.push( block );
-			return blocks;
-		};
-		const { core: coreItems, noncore: nonCoreItems } = items.reduce(
-			groupByType,
-			{ core: [], noncore: [] }
-		);
-		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.blocks.order,
-		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
+			const items = blockTypeInserterItems.reduce(
+				( accumulator, item ) => {
+					const { variations = [] } = item;
+					// Exclude any block type item that is to be replaced by a default variation.
+					if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+						accumulator.push( item );
+					}
+					if ( variations.length ) {
+						const variationMapper = getItemFromVariation(
+							state,
+							item
+						);
+						accumulator.push(
+							...variations.map( variationMapper )
+						);
+					}
+					return accumulator;
+				},
+				[]
+			);
+
+			// Ensure core blocks are prioritized in the returned results,
+			// because third party blocks can be registered earlier than
+			// the core blocks (usually by using the `init` action),
+			// thus affecting the display order.
+			// We don't sort reusable blocks as they are handled differently.
+			const groupByType = ( blocks, block ) => {
+				const { core, noncore } = blocks;
+				const type = block.name.startsWith( 'core/' ) ? core : noncore;
+
+				type.push( block );
+				return blocks;
+			};
+			const { core: coreItems, noncore: nonCoreItems } = items.reduce(
+				groupByType,
+				{ core: [], noncore: [] }
+			);
+			const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
+			return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
+		},
+		( state, rootClientId ) => [
+			state.blockListSettings[ rootClientId ],
+			state.blocks.byClientId.get( rootClientId ),
+			state.blocks.order,
+			state.preferences.insertUsage,
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+			getBlockTypes(),
+		]
+	)
 );
 
 /**
@@ -2125,28 +2141,25 @@ export const getBlockTransformItems = createSelector(
  *
  * @return {boolean} Items that appear in inserter.
  */
-export const hasInserterItems = createSelector(
-	( state, rootClientId = null ) => {
-		const hasBlockType = getBlockTypes().some( ( blockType ) =>
-			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-		);
-		if ( hasBlockType ) {
-			return true;
-		}
-		const hasReusableBlock =
-			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
-			getReusableBlocks( state ).length > 0;
+export const hasInserterItems = createRegistrySelector(
+	( select ) =>
+		( state, rootClientId = null ) => {
+			const hasBlockType = getBlockTypes().some( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			);
+			if ( hasBlockType ) {
+				return true;
+			}
+			const hasReusableBlock =
+				canInsertBlockTypeUnmemoized(
+					state,
+					'core/block',
+					rootClientId
+				) &&
+				unlock( select( STORE_NAME ) ).getReusableBlocks().length > 0;
 
-		return hasReusableBlock;
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
+			return hasReusableBlock;
+		}
 );
 
 /**
@@ -2167,11 +2180,9 @@ export const getAllowedBlocks = createSelector(
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 
-		const hasReusableBlock =
-			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
-			getReusableBlocks( state ).length > 0;
-
-		if ( hasReusableBlock ) {
+		if (
+			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId )
+		) {
 			blockTypes.push( 'core/block' );
 		}
 
@@ -2182,7 +2193,6 @@ export const getAllowedBlocks = createSelector(
 		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
-		getReusableBlocks( state ),
 		getBlockTypes(),
 	]
 );
@@ -2511,18 +2521,21 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
  *
  * @return {string} The reusable block saved title.
  */
-export const __experimentalGetReusableBlockTitle = createSelector(
-	( state, ref ) => {
-		const reusableBlock = getReusableBlocks( state ).find(
-			( block ) => block.id === ref
-		);
-		if ( ! reusableBlock ) {
-			return null;
-		}
+export const __experimentalGetReusableBlockTitle = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, ref ) => {
+				const reusableBlock = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( block ) => block.id === ref );
+				if ( ! reusableBlock ) {
+					return null;
+				}
 
-		return reusableBlock.title?.raw;
-	},
-	( state ) => [ getReusableBlocks( state ) ]
+				return reusableBlock.title?.raw;
+			},
+			() => [ unlock( select( STORE_NAME ) ).getReusableBlocks() ]
+		)
 );
 
 /**
@@ -2554,17 +2567,6 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
  */
 export function __experimentalGetLastBlockAttributeChanges( state ) {
 	return state.lastBlockAttributesChange;
-}
-
-/**
- * Returns the available reusable blocks
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} Reusable blocks
- */
-function getReusableBlocks( state ) {
-	return state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 
 /**

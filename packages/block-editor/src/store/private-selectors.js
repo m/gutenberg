@@ -333,6 +333,17 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	}, getAllPatternsDependants )
 );
 
+const EMPTY_ARRAY = [];
+
+export const getReusableBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return reusableBlocksSelect
+			? reusableBlocksSelect( select )
+			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	}
+);
+
 /**
  * Returns the element of the last element that had focus when focus left the editor canvas.
  *
