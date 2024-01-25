@@ -293,12 +293,21 @@ test.describe( 'Pattern Overrides', () => {
 			page.getByRole( 'link', { name: 'wp.org' } )
 		).toContainText( 'opens in a new tab' );
 
+		const linkPopover = page.locator(
+			'.components-popover__content .block-editor-link-control'
+		);
+
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Advanced' } ).click();
+
 		const openInNewTabCheckbox = page.getByRole( 'checkbox', {
 			name: 'Open in new tab',
 		} );
 		await expect( openInNewTabCheckbox ).toBeChecked();
 
 		await openInNewTabCheckbox.setChecked( false );
+
+		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
