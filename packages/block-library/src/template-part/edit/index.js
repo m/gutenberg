@@ -7,13 +7,15 @@ import {
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
+	useInnerBlocksProps,
+	useSettings,
 	RecursionProvider,
 	useHasRecursion,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -67,11 +69,52 @@ function ReplaceButton( {
 	);
 }
 
+function NonEditableTemplatePartPreview( {
+	postId: id,
+	layout,
+	tagName: TagName,
+	blockProps,
+} ) {
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings()?.supportsLayout;
+	}, [] );
+	const [ defaultLayout ] = useSettings( 'layout' );
+	const usedLayout = layout?.inherit ? defaultLayout || {} : layout;
+
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part', {
+		id,
+		context: 'view',
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onChange: () => {},
+		onInput: () => {},
+		renderAppender: undefined,
+		layout: themeSupportsLayout ? usedLayout : undefined,
+	} );
+
+	return <TagName { ...innerBlocksProps } />;
+}
+
 export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { canEditTemplatePart, canViewTemplatePart } = useSelect(
+		( select ) => ( {
+			canEditTemplatePart:
+				select( coreStore ).canUser( 'create', 'template-parts' ) ??
+				false,
+			canViewTemplatePart:
+				select( coreStore ).canUser( 'read', 'template-parts' ) ??
+				false,
+		} ),
+		[]
+	);
+
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -125,6 +168,23 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
+
+	if ( ! canEditTemplatePart && canViewTemplatePart ) {
+		return (
+			<RecursionProvider uniqueId={ templatePartId }>
+				<NonEditableTemplatePartPreview
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+					tagName={ TagName }
+					blockProps={ blockProps }
+					postId={ templatePartId }
+					hasInnerBlocks={ innerBlocks.length > 0 }
+					layout={ layout }
+				/>
+			</RecursionProvider>
+		);
+	}
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
