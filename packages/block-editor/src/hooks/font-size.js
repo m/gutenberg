@@ -23,10 +23,7 @@ import {
 } from './utils';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -190,17 +187,14 @@ function useBlockProps( { name, fontSize, style } ) {
 	// BlockListBlock instead of using getEditWrapperProps then the value is
 	// clobbered when the core/style/addEditProps filter runs.
 
-	// TODO: We can do the thing above now.
-	const fluidTypographySettings = getFluidTypographyOptionsFromSettings(
-		select( blockEditorStore ).getSettings().__experimentalFeatures
-	);
-
 	if ( fontSize ) {
 		props = {
 			style: {
 				fontSize: getTypographyFontSizeValue(
 					{ size: fontSize },
-					fluidTypographySettings
+					// TODO: We can do the thing above now.
+					select( blockEditorStore ).getSettings()
+						.__experimentalFeatures
 				),
 			},
 		};

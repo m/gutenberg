@@ -23,10 +23,7 @@ import {
 	appendToSelector,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { getDuotoneFilter } from '../duotone/utils';
@@ -430,7 +427,7 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				getFluidTypographyOptionsFromSettings( tree?.settings )
+				tree?.settings
 			);
 		}
 
