@@ -252,10 +252,12 @@ export default function ReusableBlockEdit( {
 		[ patternClientId, ref ]
 	);
 
-	const editOriginal = onSelectEntityRecord( {
-		postId: ref,
-		postType: 'wp_block',
-	} );
+	const editOriginal = onSelectEntityRecord
+		? onSelectEntityRecord( {
+				postId: ref,
+				postType: 'wp_block',
+		  } )
+		: undefined;
 
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
