@@ -86,7 +86,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		if ( $page > $max_pages && $total_items > 0 ) {
 			return new WP_Error(
 				'rest_post_invalid_page_number',
-				__( 'The page number requested is larger than the number of pages available.', 'default' ),
+				__( 'The page number requested is larger than the number of pages available.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}

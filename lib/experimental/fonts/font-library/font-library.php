@@ -134,7 +134,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 
 $google_fonts = array(
 	'slug'        => 'google-fonts',
-	'name'        => 'Google Fonts',
+	'name'        => __( 'Google Fonts', 'gutenberg' ),
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
 );

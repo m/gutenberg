@@ -90,7 +90,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Whether to bypass Trash and force deletion.', 'default' ),
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'gutenberg' ),
 						),
 					),
 				),
@@ -469,7 +469,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			// Base properties for every Post.
 			'properties' => array(
 				'id'                 => array(
-					'description' => __( 'Unique identifier for the post.', 'default' ),
+					'description' => __( 'Unique identifier for the post.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
@@ -658,7 +658,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	protected function get_parent_font_family_post( $font_family_id ) {
 		$error = new WP_Error(
 			'rest_post_invalid_parent',
-			__( 'Invalid post parent ID.', 'default' ),
+			__( 'Invalid post parent ID.', 'gutenberg' ),
 			array( 'status' => 404 )
 		);
 
@@ -777,7 +777,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$status = 500;
 		$code   = 'rest_font_upload_unknown_error';
 
-		if ( __( 'Sorry, you are not allowed to upload this file type.', 'default' ) === $message ) {
+		if ( __( 'Sorry, you are not allowed to upload this file type.', 'gutenberg' ) === $message ) {
 			$status = 400;
 			$code   = 'rest_font_upload_invalid_file_type';
 		}

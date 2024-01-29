@@ -272,7 +272,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			// Base properties for every Post.
 			'properties' => array(
 				'id'                   => array(
-					'description' => __( 'Unique identifier for the post.', 'default' ),
+					'description' => __( 'Unique identifier for the post.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
@@ -301,19 +301,19 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					'context'              => array( 'view', 'edit', 'embed' ),
 					'properties'           => array(
 						'name'       => array(
-							'description' => 'Name of the font family preset, translatable.',
+							'description' => __( 'Name of the font family preset, translatable.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'slug'       => array(
-							'description' => 'Kebab-case unique identifier for the font family preset.',
+							'description' => __( 'Kebab-case unique identifier for the font family preset.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'fontFamily' => array(
-							'description' => 'CSS font-family value.',
+							'description' => __( 'CSS font-family value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'preview'    => array(
-							'description' => 'URL to a preview image of the font family.',
+							'description' => __( 'URL to a preview image of the font family.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 					),
