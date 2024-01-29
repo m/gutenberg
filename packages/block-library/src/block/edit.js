@@ -225,35 +225,37 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getBlocks,
-					getBlockEditingMode: editingMode,
-					getSettings,
-				} = select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		onSelectEntityRecord,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getBlockEditingMode: editingMode,
+				getSettings,
+			} = select( blockEditorStore );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
-				};
-			},
-			[ patternClientId, ref ]
-		);
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: editingMode,
+				onSelectEntityRecord: getSettings().onSelectEntityRecord,
+			};
+		},
+		[ patternClientId, ref ]
+	);
 
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-		  } )
-		: {};
+	const editOriginal = onSelectEntityRecord( {
+		postId: ref,
+		postType: 'wp_block',
+	} );
 
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
@@ -350,7 +352,7 @@ export default function ReusableBlockEdit( {
 
 	const handleEditOriginal = ( event ) => {
 		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
-		editOriginalProps.onClick( event );
+		editOriginal( event );
 	};
 
 	const resetOverrides = () => {
@@ -387,13 +389,10 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+			{ userCanEdit && editOriginal && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginalProps.href }
-							onClick={ handleEditOriginal }
-						>
+						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>

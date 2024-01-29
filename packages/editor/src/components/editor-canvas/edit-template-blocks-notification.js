@@ -27,7 +27,7 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { renderingMode, getPostLinkProps, templateId } = useSelect(
+	const { renderingMode, onSelectEntityRecord, templateId } = useSelect(
 		( select ) => {
 			const {
 				getRenderingMode,
@@ -36,18 +36,17 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			} = select( editorStore );
 			return {
 				renderingMode: getRenderingMode(),
-				getPostLinkProps: getEditorSettings().getPostLinkProps,
+				onSelectEntityRecord: getEditorSettings().onSelectEntityRecord,
 				templateId: getCurrentTemplateId(),
 			};
 		},
 		[]
 	);
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: templateId,
-				postType: 'wp_template',
-		  } )
-		: {};
+	const selectTemplate = onSelectEntityRecord( {
+		postId: templateId,
+		postType: 'wp_template',
+	} );
+
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
@@ -70,6 +69,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			if ( isNoticeAlreadyShowing ) {
 				return;
 			}
+
 			const { notice } = await createInfoNotice(
 				__( 'Edit your template to edit this block.' ),
 				{
@@ -78,7 +78,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => editTemplate.onClick(),
+							onClick: () => selectTemplate(),
 						},
 					],
 				}
@@ -106,7 +106,15 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, renderingMode, contentRef.current ] );
+	}, [
+		lastNoticeId,
+		renderingMode,
+		contentRef,
+		getNotices,
+		createInfoNotice,
+		selectTemplate,
+		removeNotice,
+	] );
 
 	return (
 		<ConfirmDialog
@@ -114,7 +122,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				editTemplate.onClick();
+				selectTemplate();
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

@@ -21,7 +21,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import usePostHistory from './hooks/use-post-history';
+import useLoadEntityRecord from './hooks/use-load-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -32,7 +32,7 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
+	const { currentPost, onSelectEntityRecord, goBack } = useLoadEntityRecord(
 		initialPostId,
 		initialPostType
 	);
@@ -83,7 +83,7 @@ function Editor( {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
-			getPostLinkProps,
+			onSelectEntityRecord,
 			goBack,
 			defaultRenderingMode,
 			__experimentalPreferredStyleVariations: {
@@ -98,7 +98,7 @@ function Editor( {
 		hasInlineToolbar,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
-		getPostLinkProps,
+		onSelectEntityRecord,
 		goBack,
 		defaultRenderingMode,
 	] );
