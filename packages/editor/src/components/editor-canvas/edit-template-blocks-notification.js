@@ -43,10 +43,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		},
 		[]
 	);
-	const selectTemplate = onNavigateToEntityRecord( {
-		postId: templateId,
-		postType: 'wp_template',
-	} );
 
 	const { getNotices } = useSelect( noticesStore );
 
@@ -79,7 +75,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => selectTemplate(),
+							onClick: () =>
+								onNavigateToEntityRecord( {
+									postId: templateId,
+									postType: 'wp_template',
+								} ),
 						},
 					],
 				}
@@ -113,8 +113,9 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		contentRef,
 		getNotices,
 		createInfoNotice,
-		selectTemplate,
 		removeNotice,
+		onNavigateToEntityRecord,
+		templateId,
 	] );
 
 	return (
@@ -123,7 +124,10 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				selectTemplate();
+				onNavigateToEntityRecord( {
+					postId: templateId,
+					postType: 'wp_template',
+				} );
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

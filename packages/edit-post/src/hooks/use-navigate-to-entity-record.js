@@ -38,13 +38,10 @@ export default function useNavigateToEntityRecord(
 	);
 
 	const onNavigateToEntityRecord = useCallback( ( params ) => {
-		return ( event ) => {
-			event?.preventDefault();
-			dispatch( {
-				type: 'push',
-				post: { postId: params.postId, postType: params.postType },
-			} );
-		};
+		dispatch( {
+			type: 'push',
+			post: { postId: params.postId, postType: params.postType },
+		} );
 	}, [] );
 
 	const onNavigateToPreviousEntityRecord = useCallback( () => {
