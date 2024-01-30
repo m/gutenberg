@@ -15,9 +15,12 @@ import { useCallback, useReducer } from '@wordpress/element';
  * @param {string} initialPostType The post type of the post when the editor loaded.
  *
  * @return {Object} An object containing the `currentPost` variable and
- *                 `onSelectEntityRecord` and `goBack` functions.
+ *                 `onNavigateToEntityRecord` and `onNavigateToPreviousEntityRecord` functions.
  */
-export default function useLoadEntityRecord( initialPostId, initialPostType ) {
+export default function useNavigateToEntityRecord(
+	initialPostId,
+	initialPostType
+) {
 	const [ postHistory, dispatch ] = useReducer(
 		( historyState, { type, post } ) => {
 			if ( type === 'push' ) {
@@ -34,7 +37,7 @@ export default function useLoadEntityRecord( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const onSelectEntityRecord = useCallback( ( params ) => {
+	const onNavigateToEntityRecord = useCallback( ( params ) => {
 		return ( event ) => {
 			event?.preventDefault();
 			dispatch( {
@@ -44,7 +47,7 @@ export default function useLoadEntityRecord( initialPostId, initialPostType ) {
 		};
 	}, [] );
 
-	const goBack = useCallback( () => {
+	const onNavigateToPreviousEntityRecord = useCallback( () => {
 		dispatch( { type: 'pop' } );
 	}, [] );
 
@@ -52,7 +55,10 @@ export default function useLoadEntityRecord( initialPostId, initialPostType ) {
 
 	return {
 		currentPost,
-		onSelectEntityRecord,
-		goBack: postHistory.length > 1 ? goBack : undefined,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord:
+			postHistory.length > 1
+				? onNavigateToPreviousEntityRecord
+				: undefined,
 	};
 }

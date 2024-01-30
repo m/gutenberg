@@ -11,7 +11,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useLoadEntityRecord from './use-load-entity-record';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -88,7 +88,7 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const onSelectEntityRecord = useLoadEntityRecord();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -126,7 +126,7 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			onSelectEntityRecord,
+			onNavigateToEntityRecord,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -135,7 +135,7 @@ export function useSpecificEditorSettings() {
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		onSelectEntityRecord,
+		onNavigateToEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );

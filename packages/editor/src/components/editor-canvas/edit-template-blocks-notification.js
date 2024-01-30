@@ -27,7 +27,7 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { renderingMode, onSelectEntityRecord, templateId } = useSelect(
+	const { renderingMode, onNavigateToEntityRecord, templateId } = useSelect(
 		( select ) => {
 			const {
 				getRenderingMode,
@@ -36,13 +36,14 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			} = select( editorStore );
 			return {
 				renderingMode: getRenderingMode(),
-				onSelectEntityRecord: getEditorSettings().onSelectEntityRecord,
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
 				templateId: getCurrentTemplateId(),
 			};
 		},
 		[]
 	);
-	const selectTemplate = onSelectEntityRecord( {
+	const selectTemplate = onNavigateToEntityRecord( {
 		postId: templateId,
 		postType: 'wp_template',
 	} );

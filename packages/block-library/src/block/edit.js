@@ -229,7 +229,7 @@ export default function ReusableBlockEdit( {
 		innerBlocks,
 		userCanEdit,
 		getBlockEditingMode,
-		onSelectEntityRecord,
+		onNavigateToEntityRecord,
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -246,14 +246,15 @@ export default function ReusableBlockEdit( {
 				innerBlocks: blocks,
 				userCanEdit: canEdit,
 				getBlockEditingMode: editingMode,
-				onSelectEntityRecord: getSettings().onSelectEntityRecord,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
 			};
 		},
 		[ patternClientId, ref ]
 	);
 
-	const editOriginal = onSelectEntityRecord
-		? onSelectEntityRecord( {
+	const editOriginal = onNavigateToEntityRecord
+		? onNavigateToEntityRecord( {
 				postId: ref,
 				postType: 'wp_block',
 		  } )
